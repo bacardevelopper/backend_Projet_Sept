@@ -7,5 +7,6 @@ const myRouterUser = express.Router();
 
 /* ----------- */
 myRouterUser.post('/signup', fonctionID.createUser);
+myRouterUser.post('/login', fonctionID.loginUser);
 
 module.exports = myRouterUser;
