@@ -22,47 +22,78 @@ exports.createUser = (req, res, next) => {
       /* Verification : email exist in bdd */
       db.query(sqlSelectEmail, (error, results) => {
         // on verifie si l'email existe
-        if (results) {
+        if (results && results.length === 0) {
           // console.log(results);
-          // si on  trouve pas l'email
-          if (results.length === 0) {
-            res.json({ message: "email non existant " });
-            /* BCRYPT */
-            bcrypt
-              .hash(password, saltRounds)
-              .then((hash) => {
-                const sqlInsert = `INSERT INTO members (adressemail, password) VALUES('${email}', '${hash}')`;
-                db.query(sqlInsert, (error, results) => {
-                  if (!error) {
-                    res.status(200).json({ message: "bien ajouté" });
-                    console.log("email bien ajoutée");
-                  } else {
-                    console.log(error.message);
-                  }
-                });
-              })
-              .catch((error) => {
-                /* console.log(error); */
+          // si on  trouve pas l'email ; on lance le hashage
+
+          /* BCRYPT */
+          bcrypt
+            .hash(password, saltRounds)
+            .then((hash) => {
+              const sqlInsert = `INSERT INTO members (adressemail, password) VALUES('${email}', '${hash}')`;
+              db.query(sqlInsert, (error, results) => {
+                if (!error) {
+                  console.log("email bien ajoutée");
+                  return res.status(200).json({ message: "bien ajouté" });
+                } else {
+                  console.log(error.message);
+                }
               });
-            /* FIN BCRYPT */
-          } // fin results
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+          /* FIN BCRYPT */
         } else {
-          
+          res.status(400).json({message : 'email déjà existant'});
           console.log(error.message);
         }
       });
     } else {
-      return res.json({ message: "ce n'est pas un email valide" });
+      return res.status(400).json({ message: "ce n'est pas un email valide" });
     }
   } else {
-    return res.json({ messahge: "erreur champ vide" });
+    return res.status(400).json({ message : "erreur champ vide" });
   }
 };
 
-
+/* CONNEXION */
 exports.loginUser = (req, res, next) => {
-  if (req.body.email !== "" && req.body.mdp !== "") {
+  if (
+    req.body.email !== "" &&
+    req.body.mdp !== "" &&
+    /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(req.body.email)
+  ) {
+    // SQL PREPARE REQUETE
+    let sqlSelectLogin = `SELECT adressemail FROM members WHERE adressemail = '${req.body.email}'`;
+    let sqlSelectMdp = `SELECT password FROM members WHERE adressemail = '${req.body.email}'`;
+
+    /* Verification : email exist in bdd */
+    db.query(sqlSelectLogin, (error, results) => {
+
+      if (results.length === 0) {
+        console.log("email not found");
+        res.status(400).json({ message: "email not found" });
+      } else {
+        db.query(sqlSelectMdp, (error, results) => {
+          if(results){
+            console.log(results[0]);
+            bcrypt.compare(req.body.mdp, results[0].password, (err, result) => {
+              if(result){
+                return res.status(200).json({message : 'mot de passe trouver et correspond'});
+              }else{
+                return res.status(400).json({message : 'mot de passe ne correspond pas'});
+              }
+            });
+
+          } else {
+            console.log(error.message);
+          }
+        });
+      }
+    });
+    // NOT EMAIL
   } else {
-    
+    res.status(400).json({ message: "données vide ou ce n'est pas un email" });
   }
-}
+};
