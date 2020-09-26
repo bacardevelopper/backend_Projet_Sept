@@ -1,13 +1,12 @@
 /* modules used */
 const express = require('express');
 const bPraser = require('body-parser');
-const mongoose = require('path');
 const helmet = require('helmet');
-const mysql = require('mysql');
 /* modules used */
 
-/* routers used */
+/* ROUTERS USED */
 const routersUser = require('./routers/routerUser');
+const routerArticles = require('./routers/routerPost');
 /* routers used */
 
 /* configuration connexion DB */
@@ -36,7 +35,7 @@ app.use(bPraser.urlencoded({
 
 /* GLOBAL MIDDLE */
 app.use('/home', routersUser );
-// app.use('/net', / routersPost /);
+app.use('/home', routerArticles);
 
 
 /* EXPORT MODULE APP */

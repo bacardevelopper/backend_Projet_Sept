@@ -10,4 +10,6 @@ myRouterPost.post('/create', /* function phantom */);
 myRouterPost.put('/update', /* function phantom */);
 myRouterPost.delete('/delete', /* function phantom */);
 myRouterPost.get('/read/:id', /* function phantom */);
-myRouterPost.get('/read/all', /* function phantom */);
+myRouterPost.get('/read/all', fonctionPost.getPost);
+
+module.exports = myRouterPost;
