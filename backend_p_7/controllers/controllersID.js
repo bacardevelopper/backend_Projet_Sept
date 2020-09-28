@@ -1,9 +1,10 @@
 /* modules used */
 const bcrypt = require("bcrypt");
 const db = require("../models/bddConfig");
+const jwt = require("jsonwebtoken");
 /* modules used */
 
-/* FUNCTION CREATE USER (SIGNUP) */
+/* SIGNUP --------------------------------------------------------------------------------------------------- */
 /* à la reussite finale , l'utilisateur doit etre ajouter et server renvoit l'id */
 exports.createUser = (req, res, next) => {
   const saltRounds = 10;
@@ -45,7 +46,7 @@ exports.createUser = (req, res, next) => {
             });
           /* FIN BCRYPT */
         } else {
-          res.status(400).json({message : 'email déjà existant'});
+          res.status(400).json({ message: "email déjà existant" });
           console.log(error.message);
         }
       });
@@ -53,11 +54,11 @@ exports.createUser = (req, res, next) => {
       return res.status(400).json({ message: "ce n'est pas un email valide" });
     }
   } else {
-    return res.status(400).json({ message : "erreur champ vide" });
+    return res.status(400).json({ message: "erreur champ vide" });
   }
 };
 
-/* CONNEXION */
+/* CONNEXION --------------------------------------------------------------------------------------------------- */
 exports.loginUser = (req, res, next) => {
   if (
     req.body.email !== "" &&
@@ -70,22 +71,29 @@ exports.loginUser = (req, res, next) => {
 
     /* Verification : email exist in bdd */
     db.query(sqlSelectLogin, (error, results) => {
-
       if (results.length === 0) {
         console.log("email not found");
         res.status(400).json({ message: "email not found" });
       } else {
         db.query(sqlSelectMdp, (error, results) => {
-          if(results){
+          if (results) {
             console.log(results[0]);
             bcrypt.compare(req.body.mdp, results[0].password, (err, result) => {
-              if(result){
-                return res.status(200).json({message : 'mot de passe trouver et correspond'});
-              }else{
-                return res.status(400).json({message : 'mot de passe ne correspond pas'});
+              if (result) {
+                // CREATION TOKEN
+                const token = jwt.sign(
+                  { userId: req.body.email },
+                  'TOKEN_IS_FREE_OPEN_SOURCE',
+                  { expiresIn: "1h" }
+                );
+                // renvoit status et token en json au client 
+                res.status(200).json({userToken : token});
+              } else {
+                return res
+                  .status(400)
+                  .json({ message: "mot de passe ne correspond pas" });
               }
             });
-
           } else {
             console.log(error.message);
           }
