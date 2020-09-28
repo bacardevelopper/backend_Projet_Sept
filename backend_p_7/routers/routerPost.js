@@ -7,10 +7,10 @@ const authVerify = require('../middlewares/authMiddle');
 const myRouterPost = express.Router();
 
 /* ----------- */
-myRouterPost.post('/create', /* function phantom */);
-myRouterPost.put('/update', /* function phantom */);
-myRouterPost.delete('/delete', /* function phantom */);
-myRouterPost.get('/read/:id', /* function phantom */);
+myRouterPost.post('/create', authVerify/* function phantom */);
+myRouterPost.put('/update', authVerify/* function phantom */);
+myRouterPost.delete('/delete', authVerify/* function phantom */);
+myRouterPost.get('/read/:id', authVerify/* function phantom */);
 myRouterPost.post('/read/all', authVerify, fonctionPost.getPost);
 
 module.exports = myRouterPost;
