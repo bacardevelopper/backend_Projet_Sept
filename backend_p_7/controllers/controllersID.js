@@ -16,28 +16,31 @@ exports.createUser = (req, res, next) => {
       let password = req.body.mdp;
 
       // SQL PREPARE REQUETE
-      let sqlSelectEmail = `SELECT adressemail FROM members WHERE adressemail = '${email}'`;
+      let sqlSelectEmail = `SELECT email FROM users WHERE email = '${email}'`;
       console.log(req.body);
 
       /* EXECUTION DES REQUETES */
       /* Verification : email exist in bdd */
       db.query(sqlSelectEmail, (error, results) => {
         // on verifie si l'email existe
+        
         if (results && results.length === 0) {
+          
           // console.log(results);
           // si on  trouve pas l'email ; on lance le hashage
-
+          console.log(results);
           /* BCRYPT */
           bcrypt
             .hash(password, saltRounds)
             .then((hash) => {
-              const sqlInsert = `INSERT INTO members (adressemail, password) VALUES('${email}', '${hash}')`;
+              const sqlInsert = `INSERT INTO users (email, password) VALUES('${email}', '${hash}')`;
+              console.log(sqlInsert);
               db.query(sqlInsert, (error, results) => {
                 if (!error) {
                   console.log("email bien ajoutée");
                   return res.status(200).json({ message: "bien ajouté" });
                 } else {
-                  console.log(error.message);
+                  console.log(error);
                 }
               });
             })
@@ -46,8 +49,8 @@ exports.createUser = (req, res, next) => {
             });
           /* FIN BCRYPT */
         } else {
-          res.status(400).json({ message: "email déjà existant" });
-          console.log(error.message);
+          return res.status(400).json({ message: "email déjà existant" });
+          console.log('error : '+error);
         }
       });
     } else {
@@ -66,8 +69,8 @@ exports.loginUser = (req, res, next) => {
     /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(req.body.email)
   ) {
     // SQL PREPARE REQUETE
-    let sqlSelectLogin = `SELECT adressemail FROM members WHERE adressemail = '${req.body.email}'`;
-    let sqlSelectMdp = `SELECT password FROM members WHERE adressemail = '${req.body.email}'`;
+    let sqlSelectLogin = `SELECT email FROM users WHERE email = '${req.body.email}'`;
+    let sqlSelectMdp = `SELECT password FROM users WHERE email = '${req.body.email}'`;
 
     /* Verification : email exist in bdd */
     db.query(sqlSelectLogin, (error, results) => {
