@@ -76,7 +76,7 @@ exports.loginUser = (req, res, next) => {
     db.query(sqlSelectLogin, (error, results) => {
       if (results.length === 0) {
         console.log("email not found");
-        res.status(400).json({ message: "email not found" });
+        return res.status(400).json({ message: "email not found" });
       } else {
         db.query(sqlSelectMdp, (error, results) => {
           if (results) {
@@ -90,7 +90,7 @@ exports.loginUser = (req, res, next) => {
                   { expiresIn: "1h" }
                 );
                 // renvoit status et token en json au client 
-                res.status(200).json({userToken : token});
+                return res.status(200).json({userToken : token});
               } else {
                 return res
                   .status(400)
