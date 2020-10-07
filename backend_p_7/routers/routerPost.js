@@ -7,7 +7,7 @@ const upload = require('../middlewares/uploadfilesMiddle');
 const myRouterPost = express.Router();
 /* ----------- */
 
-myRouterPost.post('/create', authVerify,/* upload,*/ fonctionPost.createPost);
+myRouterPost.post('/create', authVerify , upload /*, fonctionPost.createPost*/);
 myRouterPost.put('/update', authVerify/* function phantom */);
 myRouterPost.delete('/delete', authVerify/* function phantom */);
 myRouterPost.get('/read/:id', authVerify/* function phantom */);

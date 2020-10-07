@@ -3,12 +3,11 @@ const express = require('express');
 const bPraser = require('body-parser');
 const helmet = require('helmet');
 const path = require('path');
-const fileUpload = require('express-fileupload');
+const formidable = require('express-formidable');
 /* modules used */
 
 /*  CREATE EXPRESS APP */
 const app = express();
-
 app.use(helmet());
 
 /* HEADERS CORS */
@@ -25,8 +24,7 @@ app.use(bPraser.json());
 app.use(bPraser.urlencoded({
 	extended : true
 }));
-app.use(fileUpload());
-
+app.use(formidable());
 
 
 /* ROUTERS USED */
@@ -36,7 +34,7 @@ const routerArticles = require('./routers/routerPost');
 
 /* GLOBAL MIDDLE */
 /* serve static files, and join path global */
-app.use('/uploadfiles', express.static(path.join(__dirname, 'uploadfiles')));
+app.use('/uploadfiles', express.static(path.join(__dirname+ 'uploadfiles')));
 app.use('/home', routersUser );
 app.use('/home',  routerArticles);
 

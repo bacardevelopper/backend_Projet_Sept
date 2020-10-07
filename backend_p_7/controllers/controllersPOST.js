@@ -21,7 +21,9 @@ exports.createPost = (req, res, next) => {
 
         db.query(sqlInsertPost, (error, results) => {
           if(!error){
+            console.log('bien ajouté a la bdd');
             return res.status(201).json({mesage : 'bien reçu jusqu\'au backend ctrl'});
+            
           }else{
             return res.status(400).json({message : 'données non enregistrer dans la bdd'});
           }
@@ -42,7 +44,7 @@ exports.getPost = (req, res, next) => {
   let selectGetPost = `SELECT * FROM post`;
   db.query(selectGetPost, (error, results) => {
     if (!error) {
-      console.log(results);
+      console.log('ok');
       return res.status(200).json(results);
     } else {
       return res.status(400).json({message : 'erreur 400'});
