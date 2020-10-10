@@ -34,7 +34,7 @@ const routerArticles = require('./routers/routerPost');
 
 /* GLOBAL MIDDLE */
 /* serve static files, and join path global */
-app.use('/uploadfiles', express.static(path.join(__dirname+ 'uploadfiles')));
+app.use('/uploadfiles', express.static(path.join(__dirname, 'uploadfiles')));
 app.use('/home', routersUser );
 app.use('/home',  routerArticles);
 

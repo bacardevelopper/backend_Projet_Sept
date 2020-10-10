@@ -6,18 +6,22 @@ const path = require("path");
 module.exports = (req, res, next) => {
   console.log(req.files.file.name);
   const file = req.files.file;
-
+  console.log(req.fields.cookie);
   let oldpath = file.path;
-  let newPath ='C:\\Users\\gazab\\OneDrive\\Bureau\\project_7_realese\\backend_p_7\\uploadfiles\\'+ file.name;
+  let newPath = process.cwd() + "/uploadFiles/" + "" + "fil" + file.name;
 
   fs.readFile(oldpath, (err, data) => {
     console.log(err);
     fs.writeFile(newPath, data, (err) => {
       if (err) {
         console.log(err);
-        res.status(500).json({ msg: "non upl" });
       } else {
-        res.status(200).json({ msg: "success" });
+        console.log(newPath);
+        req.files.urlfile = `${req.protocol}://${req.get(
+          "host"
+        )}/uploadfiles/fil${file.name}`;
+
+        next();
       }
     });
   });

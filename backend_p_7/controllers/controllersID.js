@@ -7,13 +7,18 @@ const jwt = require("jsonwebtoken");
 /* SIGNUP --------------------------------------------------------------------------------------------------- */
 /* à la reussite finale , l'utilisateur doit etre ajouter et server renvoit l'id */
 exports.createUser = (req, res, next) => {
-  const saltRounds = 10;
+  let saltRounds = 10;
+  req.body.user = req.fields.user;
+  console.log(req.fields.user);
+  console.log('------------------');
+  console.log(req.body.user);
+  let user = JSON.parse(req.body.user);
 
-  if (req.body.email !== "" && req.body.mdp !== "") {
+  if (user.email !== "" && user.mdp !== "") {
     // EMAIL FORMAT OK
-    if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(req.body.email)) {
-      let email = req.body.email;
-      let password = req.body.mdp;
+    if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(user.email)) {
+      let email = user.email;
+      let password = user.mdp;
 
       // SQL PREPARE REQUETE
       let sqlSelectEmail = `SELECT email FROM users WHERE email = '${email}'`;
@@ -63,14 +68,20 @@ exports.createUser = (req, res, next) => {
 
 /* CONNEXION --------------------------------------------------------------------------------------------------- */
 exports.loginUser = (req, res, next) => {
+  req.body.user = req.fields.user;
+  console.log(req.fields.user);
+  console.log('------------------');
+  console.log(req.body.user);
+  let user = JSON.parse(req.body.user);
+  
   if (
-    req.body.email !== "" &&
-    req.body.mdp !== "" &&
-    /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(req.body.email)
+    user.email !== "" &&
+    user.mdp !== "" &&
+    /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(user.email)
   ) {
     // SQL PREPARE REQUETE
-    let sqlSelectLogin = `SELECT email FROM users WHERE email = '${req.body.email}'`;
-    let sqlSelectMdp = `SELECT password FROM users WHERE email = '${req.body.email}'`;
+    let sqlSelectLogin = `SELECT email FROM users WHERE email = '${user.email}'`;
+    let sqlSelectMdp = `SELECT password FROM users WHERE email = '${user.email}'`;
 
     /* Verification : email exist in bdd */
     db.query(sqlSelectLogin, (error, results) => {
@@ -81,11 +92,11 @@ exports.loginUser = (req, res, next) => {
         db.query(sqlSelectMdp, (error, results) => {
           if (results) {
             console.log(results[0]);
-            bcrypt.compare(req.body.mdp, results[0].password, (err, result) => {
+            bcrypt.compare(user.mdp, results[0].password, (err, result) => {
               if (result) {
                 // CREATION TOKEN
                 const token = jwt.sign(
-                  { userId: req.body.email },
+                  { userId: user.email },
                   'TOKEN_IS_FREE_OPEN_SOURCE',
                   { expiresIn: "1h" }
                 );
