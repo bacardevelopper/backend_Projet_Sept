@@ -3,7 +3,7 @@ const db = require("../models/bddConfig");
 /* CREATE --------------------------------------------------------------------------------------------------- */
 exports.createPost = (req, res, next) => {
     req.body = req.fields;
-    console.log('/* ---------- DATA FIELDS ----------- */');
+    console.log("/* ---------- DATA FIELDS ----------- */");
     console.log(req.fields);
     console.table(req.body);
     console.log(req.fields.data);
@@ -16,36 +16,47 @@ exports.createPost = (req, res, next) => {
     console.log(req.fields.emailUser);
     const urlFictif = req.files.urlfile;
     /* ------------------------------------------------------------- */
-    if(data.titre !== "" && data.texte !== ""){
+    if (data.titre !== "" && data.texte !== "") {
         const selectIdUser = `SELECT id FROM users WHERE email = '${email}'`;
-        
+
         db.query(selectIdUser, (error, results) => {
-          if(results){
-            console.log(results[0].id);
-            /* recuperation user id */
-            const userIdFound = results[0].id;
-            const sqlInsertPost = `INSERT INTO post (userid, titre, texte, urlfile) VALUES('${userIdFound}', '${titre}','${texte}','${urlFictif}')`;
-    
-            db.query(sqlInsertPost, (error, results) => {
-              if(!error){
-                console.log('bien ajouté a la bdd');
-                return res.status(201).json({mesage : 'bien reçu jusqu\'au backend ctrl'});
-                
-              }else{
-                return res.status(400).json({message : 'données non enregistrer dans la bdd'});
-              }
-            });
-          }else{
-            console.log(error);
-          }
+            if (results) {
+                console.log(results[0].id);
+                /* recuperation user id */
+                const userIdFound = results[0].id;
+                const sqlInsertPost = `INSERT INTO post (userid, titre, texte, urlfile) VALUES('${userIdFound}', '${titre}','${texte}','${urlFictif}')`;
+
+                db.query(sqlInsertPost, (error, results) => {
+                    if (!error) {
+                        console.log("bien ajouté a la bdd");
+                        return res
+                            .status(201)
+                            .json({ mesage: "bien reçu jusqu'au backend ctrl" });
+                    } else {
+                        return res
+                            .status(400)
+                            .json({ message: "données non enregistrer dans la bdd" });
+                    }
+                });
+            } else {
+                console.log(error);
+            }
         });
-      }
+    }
 };
 /* CREATE --------------------------------------------------------------------------------------------------- */
-exports.updatePost = (req, res, next) => {};
+exports.updatePost = (req, res, next) => { };
 
-exports.deletePost = (req, res, next) => {};
+exports.deletePost = (req, res, next) => { };
 /* GET ALL ARTICLES ------------------------------------------------------------------------------------ */
-exports.getPost = (req, res, next) => {
-
+exports.geAlltPost = (req, res, next) => {
+    const selectAll = `SELECT * FROM post`;
+    db.query(selectAll, (error, results) => {
+        if (results) {
+            res.status(200).json(results);
+        } else {
+            console.log(error);
+            return res.status(400).json({ errror });
+        }
+    });
 };

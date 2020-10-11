@@ -8,6 +8,7 @@ module.exports = (req, res, next) => {
   const file = req.files.file;
   console.log(req.fields.cookie);
   let oldpath = file.path;
+  file.name = 'imgtr' + '.' + file.name.split('.')[1]
   let newPath = process.cwd() + "/uploadFiles/" + "" + "fil" + file.name;
 
   fs.readFile(oldpath, (err, data) => {
