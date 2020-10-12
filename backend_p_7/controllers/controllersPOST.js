@@ -60,3 +60,8 @@ exports.geAlltPost = (req, res, next) => {
         }
     });
 };
+
+exports.ownPost = (req, res, next) => {
+    console.log(req.fields.emailUser);
+    res.status(200).json({message : 'reussite'});
+}
