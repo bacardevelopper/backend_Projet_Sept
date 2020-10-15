@@ -9,7 +9,7 @@ const myRouterPost = express.Router();
 
 myRouterPost.post("/create", authVerify, upload, fonctionPost.createPost);
 myRouterPost.put("/update", authVerify /* function phantom */);
-myRouterPost.delete("/delete", authVerify /* function phantom */);
+myRouterPost.post("/delete", authVerify, fonctionPost.delete);
 myRouterPost.post("/own/post", authVerify, fonctionPost.ownPost);
 myRouterPost.post("/read/all/", authVerify, fonctionPost.geAlltPost);
 

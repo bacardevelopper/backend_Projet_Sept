@@ -21,7 +21,7 @@ module.exports = (req, res, next) => {
       }
     });
   } else {
-    return res.status(400).json({ message: "erreur" });
+    return res.status(400).json({ message: "erreur et non authetifié" });
   }
   
 };

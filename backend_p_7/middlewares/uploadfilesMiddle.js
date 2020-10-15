@@ -1,6 +1,6 @@
 /* modules used */
 const fs = require("fs");
-const path = require("path");
+const randomstring = require("randomstring");
 /* modules used */
 
 module.exports = (req, res, next) => {
@@ -8,7 +8,7 @@ module.exports = (req, res, next) => {
   const file = req.files.file;
   console.log(req.fields.cookie);
   let oldpath = file.path;
-  file.name = 'imgtr' + '.' + file.name.split('.')[1]
+  file.name = randomstring.generate(7) + "." + file.name.split(".")[1];
   let newPath = process.cwd() + "/uploadFiles/" + "" + "fil" + file.name;
 
   fs.readFile(oldpath, (err, data) => {
