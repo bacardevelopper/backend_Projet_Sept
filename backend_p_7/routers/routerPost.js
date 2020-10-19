@@ -8,9 +8,10 @@ const myRouterPost = express.Router();
 /* ----------- */
 
 myRouterPost.post("/create", authVerify, upload, fonctionPost.createPost);
-myRouterPost.put("/update", authVerify /* function phantom */);
+myRouterPost.put("/update", authVerify, upload, fonctionPost.updatePost );
 myRouterPost.post("/delete", authVerify, fonctionPost.delete);
 myRouterPost.post("/own/post", authVerify, fonctionPost.ownPost);
 myRouterPost.post("/read/all/", authVerify, fonctionPost.geAlltPost);
+myRouterPost.post("/profile", authVerify, fonctionPost.profileRecup )
 
 module.exports = myRouterPost;

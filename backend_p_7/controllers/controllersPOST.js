@@ -45,8 +45,18 @@ exports.createPost = (req, res, next) => {
   }
 };
 /* CREATE --------------------------------------------------------------------------------------------------- */
-exports.updatePost = (req, res, next) => {};
+exports.updatePost = (req, res, next) => {
+  console.log(req.fields.data);
+  console.log(req.files.urlfile);
+  console.log(req.fields.emailUser);
+  res.status(201).json({ message: "reçu au ctrl modify" });
 
+  /* fonction metiers qui va ajouter les mdofication */
+};
+// profile
+exports.profileRecup = (req, res, next) => {
+  return res.status(200).json(req.fields.emailUser);
+};
 exports.deletePost = (req, res, next) => {};
 /* GET ALL ARTICLES ------------------------------------------------------------------------------------ */
 exports.geAlltPost = (req, res, next) => {
