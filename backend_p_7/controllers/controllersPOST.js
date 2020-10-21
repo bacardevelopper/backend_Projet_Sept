@@ -1,5 +1,5 @@
 const db = require("../models/bddConfig");
-
+const bcrypt = require("bcrypt");
 /* CREATE --------------------------------------------------------------------------------------------------- */
 exports.createPost = (req, res, next) => {
   req.body = req.fields;
@@ -180,11 +180,43 @@ exports.moderer = (req, res, next) => {
   } else {
     db.query(updtModere, (error, results) => {
       if (results) {
-        return res.status(200).json({msg : "bien modifier"});
+        return res.status(200).json({ msg: "bien modifier" });
       } else {
         console.log(error);
         return res.status(400).json({ errror });
       }
     });
+  }
+};
+// modifier
+exports.modifierMdp = (req, res, next) => {
+  let saltRounds = 10;
+  console.log(req.fields.mdp);
+  const mdpVf = req.fields.mdp;
+  if (mdpVf.length > 5 && mdpVf !== "" && mdpVf !== '') {
+    const mdpMdf = JSON.parse(req.fields.mdp);
+    const email = req.fields.emailUser;
+
+    /* BCRYPT */
+    bcrypt
+      .hash(mdpMdf, saltRounds)
+      .then((hash) => {
+        const updtMdp = `UPDATE users SET password = '${hash}' WHERE email = '${email}'`;
+        db.query(updtMdp, (error, results) => {
+          if (!error) {
+            return res
+              .status(200)
+              .json({ message: "mot de passe bien modifier" });
+          } else {
+            console.log(error);
+          }
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+        return res.status(400).json({ message: "non hash" });
+      });
+  } else {
+    return res.status(400).json({ message: "champ vide ou 5 caracteres min" });
   }
 };
