@@ -45,19 +45,60 @@ exports.createPost = (req, res, next) => {
   }
 };
 /* CREATE --------------------------------------------------------------------------------------------------- */
-exports.updatePost = (req, res, next) => {
-  console.log(req.fields.data);
-  console.log(req.files.urlfile);
-  console.log(req.fields.emailUser);
-  res.status(201).json({ message: "reçu au ctrl modify" });
-
-  /* fonction metiers qui va ajouter les mdofication */
+/* UPDATE --------------------------------------------------------------------------------------------------- */
+exports.updtRecFront = (req, res, next) => {
+  const email = req.fields.emailUser;
+  const idDt = JSON.parse(req.fields.idarticle);
+  const idDtNumb = Number(idDt);
+  const reqPrepare = `SELECT * FROM post WHERE idpost = '${idDtNumb}'`;
+  db.query(reqPrepare, (error, results) => {
+    if (!error) {
+      res.status(200).json(results);
+    } else {
+      return res.status(400).json({ message: "error" });
+    }
+  });
 };
-// profile
+/* -------------------------------------- */
+exports.updatePost = (req, res, next) => {
+  const email = req.fields.emailUser;
+  const idDt = JSON.parse(req.fields.idarticle);
+  const idDtNumb = Number(idDt);
+  const data = JSON.parse(req.fields.data);
+  const titre = data.titre;
+  const texte = data.texte;
+  const idFile = req.body.vef;
+  /* ------------------------------------ */
+  const slct = `SELECT id FROM users WHERE email = '${email}'`;
+
+  db.query(slct, (error, results) => {
+    if (!error) {
+      const idP = results[0].id;
+      const artModifyUn = `UPDATE post SET titre = '${titre}' , texte = '${texte}' WHERE idpost = '${idDt}' AND userid = '${idP}'`;
+      const artModifyDeux = `UPDATE post SET titre = '${titre}' , texte = '${texte}', urlfile = '${req.files.urlfile}' WHERE idpost = '${idDt}' AND userid = '${idP}'`;
+      const arrayReq = [artModifyUn, artModifyDeux];
+      /* -- si fichier non present ne pas enr° url img -- */
+      db.query(arrayReq[idFile], (error, results) => {
+        if (!error) {
+          console.log(results);
+          console.log(idDt);
+          res.status(200).json({ message: "reussite update" });
+        } else {
+          console.log(error);
+          return res.status(401).json({ message: " probleme sql" });
+        }
+      });
+    } else {
+      return res.status(400).json({ msg: "pas de modification" });
+    }
+  });
+};
+/* UPDATE --------------------------------------------------------------------------------------------------- */
+/* PROFILE --------------------------------------------------------------------------------------------------- */
 exports.profileRecup = (req, res, next) => {
   return res.status(200).json(req.fields.emailUser);
 };
-exports.deletePost = (req, res, next) => {};
+/* UPDATE --------------------------------------------------------------------------------------------------- */
 /* GET ALL ARTICLES ------------------------------------------------------------------------------------ */
 exports.geAlltPost = (req, res, next) => {
   const selectAll = `SELECT * FROM post`;
@@ -79,6 +120,8 @@ exports.ownPost = (req, res, next) => {
     if (!error) {
       res.status(200).json(results);
     } else {
+      console.log(error);
+      console.log(email);
       return res.status(401).json({ msg: "erreur" });
     }
   });
