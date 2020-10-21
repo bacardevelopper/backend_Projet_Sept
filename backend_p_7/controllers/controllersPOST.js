@@ -33,6 +33,7 @@ exports.createPost = (req, res, next) => {
               .status(201)
               .json({ mesage: "bien reçu jusqu'au backend ctrl" });
           } else {
+            console.log(error);
             return res
               .status(400)
               .json({ message: "données non enregistrer dans la bdd" });
@@ -101,7 +102,7 @@ exports.profileRecup = (req, res, next) => {
 /* UPDATE --------------------------------------------------------------------------------------------------- */
 /* GET ALL ARTICLES ------------------------------------------------------------------------------------ */
 exports.geAlltPost = (req, res, next) => {
-  const selectAll = `SELECT * FROM post`;
+  const selectAll = `SELECT * FROM post WHERE statut = 1`;
   db.query(selectAll, (error, results) => {
     if (results) {
       res.status(200).json(results);
@@ -134,7 +135,7 @@ exports.delete = (req, res, next) => {
   db.query(selectUserId, (error, results) => {
     if (!error) {
       const id = results[0].id;
-      const deleteData = `DELETE FROM post WHERE idpost = ${idPostDelete}  AND userid = ${id} `;
+      const deleteData = `DELETE FROM post WHERE idpost = ${idPostDelete}  AND userid = ${id}`;
       console.log(results[0].id);
       db.query(deleteData, (error, results) => {
         if (!error) {
@@ -148,4 +149,42 @@ exports.delete = (req, res, next) => {
       return res.status(401).json({ msg: "non trouvé" });
     }
   });
+};
+/* --------------------------------- CONTROLEURS ADMIN ---------------------------- */
+exports.adminAllPost = (req, res, next) => {
+  const selectAll = `SELECT * FROM post WHERE statut = 0`;
+  if (req.fields.emailUser !== "bacar.darwin.pro@gmail.com") {
+    return res.status(401).json({ message: "vous n'etes pas un admin" });
+  } else {
+    db.query(selectAll, (error, results) => {
+      if (results) {
+        res.status(200).json(results);
+      } else {
+        console.log(error);
+        return res.status(400).json({ errror });
+      }
+    });
+  }
+};
+
+// moderer
+exports.moderer = (req, res, next) => {
+  console.log(req.fields);
+  const id = JSON.parse(req.fields.moderer);
+  const idNumb = Number(id);
+  console.log(typeof idNumb);
+  const leStatut = 1;
+  const updtModere = `UPDATE post SET statut = '${leStatut}' WHERE idpost = '${idNumb}'`;
+  if (req.fields.emailUser !== "bacar.darwin.pro@gmail.com") {
+    return res.status(200).json({ message: "bien reçu ctrl moderer" });
+  } else {
+    db.query(updtModere, (error, results) => {
+      if (results) {
+        return res.status(200).json({msg : "bien modifier"});
+      } else {
+        console.log(error);
+        return res.status(400).json({ errror });
+      }
+    });
+  }
 };

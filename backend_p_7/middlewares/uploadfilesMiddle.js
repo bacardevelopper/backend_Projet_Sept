@@ -24,7 +24,6 @@ module.exports = (req, res, next) => {
             "host"
           )}/uploadfiles/fil${file.name}`;
           req.body.vef = 1;
-
           next();
         }
       });

@@ -15,5 +15,7 @@ myRouterPost.post("/own/post", authVerify, fonctionPost.ownPost);
 myRouterPost.post("/read/all/", authVerify, fonctionPost.geAlltPost);
 myRouterPost.post("/profile", authVerify, fonctionPost.profileRecup);
 myRouterPost.post("/updt", authVerify, fonctionPost.updtRecFront);
+myRouterPost.post("/admin/all", authVerify, fonctionPost.adminAllPost);
+myRouterPost.post("/moderer", authVerify, fonctionPost.moderer);
 
 module.exports = myRouterPost;
