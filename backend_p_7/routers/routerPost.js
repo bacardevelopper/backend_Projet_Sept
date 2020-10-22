@@ -19,5 +19,6 @@ myRouterPost.post("/admin/all", authVerify, fonctionPost.adminAllPost);
 myRouterPost.post("/moderer", authVerify, fonctionPost.moderer);
 myRouterPost.put("/modifier/mdp", authVerify, fonctionPost.modifierMdp);
 myRouterPost.post("/comment", authVerify, fonctionPost.comment);
+myRouterPost.post("/all/comment", authVerify, fonctionPost.allComment);
 
 module.exports = myRouterPost;

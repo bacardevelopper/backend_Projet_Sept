@@ -174,6 +174,19 @@ exports.comment = (req, res, next) => {
     }
   });
 };
+/* VOIR LES COMMENTAIRES */
+exports.allComment = (req, res, next) => {
+  console.log(req.fields);
+  const id = JSON.parse(req.fields.idcmt);
+  const selectUserId = `SELECT * FROM coment WHERE idpost = '${id}'`;
+  db.query(selectUserId, (error, results) => {
+    if (!error) {
+      return res.status(200).json(results);
+    } else {
+      return res.status(400).json({ message: "erreur" });
+    }
+  });
+};
 /* --------------------------------- CONTROLEURS ADMIN ---------------------------- */
 exports.adminAllPost = (req, res, next) => {
   const selectAll = `SELECT * FROM post WHERE statut = 0`;
