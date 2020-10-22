@@ -150,6 +150,30 @@ exports.delete = (req, res, next) => {
     }
   });
 };
+/* ------------ commentaire ------------------------------- */
+exports.comment = (req, res, next) => {
+  console.log(req.fields);
+  const cmt = JSON.parse(req.fields.commentaire);
+  const idarticle = JSON.parse(req.fields.idArticle);
+  const email = req.fields.emailUser;
+  // trouver l'id correpondant à l'email
+  const reqA = `SELECT id FROM users WHERE email = '${email}'`;
+  db.query(reqA, (error, results) => {
+    if (!error) {
+      console.log(results);
+
+      const idUser = results[0].id;
+      const reqB = `INSERT INTO coment (iduser, commentaire, idpost) VALUES('${idUser}', '${cmt}','${idarticle}')`;
+      db.query(reqB, (error, results) => {
+        if (!error) {
+          return res.status(200).json({ message: "commentaire reçu" });
+        } else {
+          return res.status(400).json({ message: "commentaire non ajouté" });
+        }
+      });
+    }
+  });
+};
 /* --------------------------------- CONTROLEURS ADMIN ---------------------------- */
 exports.adminAllPost = (req, res, next) => {
   const selectAll = `SELECT * FROM post WHERE statut = 0`;
@@ -193,7 +217,7 @@ exports.modifierMdp = (req, res, next) => {
   let saltRounds = 10;
   console.log(req.fields.mdp);
   const mdpVf = req.fields.mdp;
-  if (mdpVf.length > 5 && mdpVf !== "" && mdpVf !== '') {
+  if (mdpVf.length > 5 && mdpVf !== "" && mdpVf !== "") {
     const mdpMdf = JSON.parse(req.fields.mdp);
     const email = req.fields.emailUser;
 

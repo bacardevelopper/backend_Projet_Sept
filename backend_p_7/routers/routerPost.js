@@ -18,5 +18,6 @@ myRouterPost.post("/updt", authVerify, fonctionPost.updtRecFront);
 myRouterPost.post("/admin/all", authVerify, fonctionPost.adminAllPost);
 myRouterPost.post("/moderer", authVerify, fonctionPost.moderer);
 myRouterPost.put("/modifier/mdp", authVerify, fonctionPost.modifierMdp);
+myRouterPost.post("/comment", authVerify, fonctionPost.comment);
 
 module.exports = myRouterPost;
