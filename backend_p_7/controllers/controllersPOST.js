@@ -187,6 +187,42 @@ exports.allComment = (req, res, next) => {
     }
   });
 };
+/* DELETE USER */
+exports.deleteUser = (req, res, next) => {
+  const email = req.fields.emailUser;
+  const selectDeleteUser = `SELECT id FROM users WHERE email = '${email}'`;
+  db.query(selectDeleteUser, (error, results) => {
+    if (!error) {
+      console.log(results[0].id);
+      /* supprimer commentaires */
+      const iduserUse = results[0].id;
+      const deleteCommentaire = `DELETE FROM coment WHERE iduser = ${iduserUse}`;
+      db.query(deleteCommentaire, (error, results) => {
+        const deletePost = `DELETE FROM post WHERE userid = ${iduserUse}`;
+        if (!error) {
+          /* supprimer post */
+          db.query(deletePost, (error, results) => {
+            const deleteUser = `DELETE FROM users WHERE id = ${iduserUse}`;
+            if (!error) {
+              db.query(deleteUser, (error, results) => {
+                return res
+                  .status(201)
+                  .json({
+                    message: "suppression de compte accepter plus d'accees",
+                  });
+              });
+            }
+          });
+        } else {
+          console.log(error);
+        }
+      });
+    } else {
+      console.log(error);
+      return res.status(401).json({ message: "no user delete" });
+    }
+  });
+};
 /* --------------------------------- CONTROLEURS ADMIN ---------------------------- */
 exports.adminAllPost = (req, res, next) => {
   const selectAll = `SELECT * FROM post WHERE statut = 0`;
