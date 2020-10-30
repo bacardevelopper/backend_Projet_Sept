@@ -102,7 +102,7 @@ exports.profileRecup = (req, res, next) => {
 /* UPDATE --------------------------------------------------------------------------------------------------- */
 /* GET ALL ARTICLES ------------------------------------------------------------------------------------ */
 exports.geAlltPost = (req, res, next) => {
-  const selectAll = `SELECT * FROM post WHERE statut = 1`;
+  const selectAll = `SELECT * FROM post WHERE statut = 1 ORDER BY datepost DESC`;
   db.query(selectAll, (error, results) => {
     if (results) {
       res.status(200).json(results);
@@ -205,11 +205,9 @@ exports.deleteUser = (req, res, next) => {
             const deleteUser = `DELETE FROM users WHERE id = ${iduserUse}`;
             if (!error) {
               db.query(deleteUser, (error, results) => {
-                return res
-                  .status(201)
-                  .json({
-                    message: "suppression de compte accepter plus d'accees",
-                  });
+                return res.status(201).json({
+                  message: "suppression de compte accepter plus d'accees",
+                });
               });
             }
           });
@@ -222,44 +220,6 @@ exports.deleteUser = (req, res, next) => {
       return res.status(401).json({ message: "no user delete" });
     }
   });
-};
-/* --------------------------------- CONTROLEURS ADMIN ---------------------------- */
-exports.adminAllPost = (req, res, next) => {
-  const selectAll = `SELECT * FROM post WHERE statut = 0`;
-  if (req.fields.emailUser !== "bacar.darwin.pro@gmail.com") {
-    return res.status(401).json({ message: "vous n'etes pas un admin" });
-  } else {
-    db.query(selectAll, (error, results) => {
-      if (results) {
-        res.status(200).json(results);
-      } else {
-        console.log(error);
-        return res.status(400).json({ errror });
-      }
-    });
-  }
-};
-
-// moderer
-exports.moderer = (req, res, next) => {
-  console.log(req.fields);
-  const id = JSON.parse(req.fields.moderer);
-  const idNumb = Number(id);
-  console.log(typeof idNumb);
-  const leStatut = 1;
-  const updtModere = `UPDATE post SET statut = '${leStatut}' WHERE idpost = '${idNumb}'`;
-  if (req.fields.emailUser !== "bacar.darwin.pro@gmail.com") {
-    return res.status(200).json({ message: "bien reçu ctrl moderer" });
-  } else {
-    db.query(updtModere, (error, results) => {
-      if (results) {
-        return res.status(200).json({ msg: "bien modifier" });
-      } else {
-        console.log(error);
-        return res.status(400).json({ errror });
-      }
-    });
-  }
 };
 // modifier
 exports.modifierMdp = (req, res, next) => {
@@ -291,5 +251,88 @@ exports.modifierMdp = (req, res, next) => {
       });
   } else {
     return res.status(400).json({ message: "champ vide ou 5 caracteres min" });
+  }
+};
+/* --------------------------------- CONTROLEURS ADMIN ---------------------------- */
+exports.adminAllPost = (req, res, next) => {
+  const selectAll = `SELECT * FROM post WHERE statut = 0`;
+  if (req.fields.emailUser !== "bacar.darwin.pro@gmail.com") {
+    return res.status(401).json({ message: "vous n'etes pas un admin" });
+  } else {
+    db.query(selectAll, (error, results) => {
+      if (results) {
+        res.status(200).json(results);
+      } else {
+        console.log(error);
+        return res.status(400).json({ errror });
+      }
+    });
+  }
+};
+
+// moderer
+exports.moderer = (req, res, next) => {
+  console.log(req.fields);
+  const id = JSON.parse(req.fields.moderer);
+  const idNumb = Number(id);
+  console.log(typeof idNumb);
+  const leStatut = 1;
+  const updtModere = `UPDATE post SET statut = '${leStatut}' WHERE idpost = '${idNumb}'`;
+  if (req.fields.emailUser !== "bacar.darwin.pro@gmail.com") {
+    return res.status(401).json({ message: "bien reçu ctrl moderer" });
+  } else {
+    db.query(updtModere, (error, results) => {
+      if (results) {
+        return res.status(200).json({ msg: "bien modifier" });
+      } else {
+        console.log(error);
+        return res.status(400).json({ error });
+      }
+    });
+  }
+};
+
+// statistique
+exports.statistiques = (req, res, next) => {
+  const selectStats = `SELECT * FROM post`;
+  const slcLastP = `SELECT userid FROM post`;
+  const sltLastP = `SELECT email FROM users INNER JOIN post  ON users.id = post.userid ORDER BY datepost DESC LIMIT 3`;
+  if (req.fields.emailUser !== "bacar.darwin.pro@gmail.com") {
+    return res.status(400).json({ message: "erreur 400" });
+  } else {
+    db.query(selectStats, (error, results) => {
+      const nbrPost = results.length;
+      if (!error) {
+        db.query("SELECT * FROM coment", (error, results) => {
+          // voir les trois derniers participants
+
+          // nombre de commentaires
+          if (!error) {
+            db.query(slcLastP, (error, results) => {
+              const data = results;
+              if (!error) {
+                db.query(sltLastP, (error, results) => {
+                  const lastP = results;
+                  if (!error) {
+                    return res.status(200).json({
+                      nbr: nbrPost,
+                      users: results,
+                      nbrComent: results.length,
+                      userFind: data,
+                      last: lastP,
+                    });
+                  }else{
+                    console.log(error);
+                  }
+                });
+              }
+            });
+            const nbrComent = results;
+          }
+        });
+      } else {
+        return res.status(400).json({ message: "erreur" });
+      }
+    });
   }
 };

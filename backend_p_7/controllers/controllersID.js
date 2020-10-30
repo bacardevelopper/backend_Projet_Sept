@@ -10,7 +10,7 @@ exports.createUser = (req, res, next) => {
   let saltRounds = 10;
   req.body.user = req.fields.user;
   console.log(req.fields.user);
-  console.log('------------------');
+  console.log("------------------");
   console.log(req.body.user);
   let user = JSON.parse(req.body.user);
 
@@ -28,9 +28,8 @@ exports.createUser = (req, res, next) => {
       /* Verification : email exist in bdd */
       db.query(sqlSelectEmail, (error, results) => {
         // on verifie si l'email existe
-        
+
         if (results && results.length === 0) {
-          
           // console.log(results);
           // si on  trouve pas l'email ; on lance le hashage
           console.log(results);
@@ -55,7 +54,7 @@ exports.createUser = (req, res, next) => {
           /* FIN BCRYPT */
         } else {
           return res.status(400).json({ message: "email déjà existant" });
-          console.log('error : '+error);
+          console.log("error : " + error);
         }
       });
     } else {
@@ -70,10 +69,10 @@ exports.createUser = (req, res, next) => {
 exports.loginUser = (req, res, next) => {
   req.body.user = req.fields.user;
   console.log(req.fields.user);
-  console.log('------------------');
+  console.log("------------------");
   console.log(req.body.user);
   let user = JSON.parse(req.body.user);
-  
+
   if (
     user.email !== "" &&
     user.mdp !== "" &&
@@ -97,11 +96,17 @@ exports.loginUser = (req, res, next) => {
                 // CREATION TOKEN
                 const token = jwt.sign(
                   { userId: user.email },
-                  'TOKEN_IS_FREE_OPEN_SOURCE',
+                  "TOKEN_IS_FREE_OPEN_SOURCE",
                   { expiresIn: "1h" }
                 );
-                // renvoit status et token en json au client 
-                return res.status(200).json({userToken : token});
+                let sqlUpdateDateLogin = `UPDATE users SET datemaj = NOW() WHERE id = '${results[0].id}'`;
+                // mise à jour de la date connexion
+                db.query(sqlUpdateDateLogin, (error, results) => {
+                  if (!error) {
+                    // renvoit status et token en json au client
+                    return res.status(200).json({ userToken: token });
+                  }
+                });
               } else {
                 return res
                   .status(400)

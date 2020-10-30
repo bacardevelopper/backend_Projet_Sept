@@ -21,5 +21,5 @@ myRouterPost.put("/modifier/mdp", authVerify, fonctionPost.modifierMdp);
 myRouterPost.post("/comment", authVerify, fonctionPost.comment);
 myRouterPost.post("/all/comment", authVerify, fonctionPost.allComment);
 myRouterPost.post("/delete/user", authVerify, fonctionPost.deleteUser)
-
+myRouterPost.post("/stats", authVerify, fonctionPost.statistiques);
 module.exports = myRouterPost;
