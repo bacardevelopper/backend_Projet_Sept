@@ -17,14 +17,15 @@ exports.createPost = (req, res, next) => {
   const urlFictif = req.files.urlfile;
   /* ------------------------------------------------------------- */
   if (data.titre !== "" && data.texte !== "") {
-    const selectIdUser = `SELECT id FROM users WHERE email = '${email}'`;
+    const selectIdUser = `SELECT id, generateid FROM users WHERE email = '${email}'`;
 
     db.query(selectIdUser, (error, results) => {
       if (results) {
         console.log(results[0].id);
         /* recuperation user id */
         const userIdFound = results[0].id;
-        const sqlInsertPost = `INSERT INTO post (userid, titre, texte, urlfile) VALUES('${userIdFound}', '${titre}','${texte}','${urlFictif}')`;
+        const leGenerateId = results[0].generateid;
+        const sqlInsertPost = `INSERT INTO post (userid, titre, texte, urlfile, usergenerate) VALUES('${userIdFound}', '${titre}','${texte}','${urlFictif}','${leGenerateId}')`;
 
         db.query(sqlInsertPost, (error, results) => {
           if (!error) {
@@ -158,21 +159,25 @@ exports.comment = (req, res, next) => {
   const email = req.fields.emailUser;
   // trouver l'id correpondant à l'email
   const reqA = `SELECT id FROM users WHERE email = '${email}'`;
-  db.query(reqA, (error, results) => {
-    if (!error) {
-      console.log(results);
+  if (cmt !== "") {
+    db.query(reqA, (error, results) => {
+      if (!error) {
+        console.log(results);
 
-      const idUser = results[0].id;
-      const reqB = `INSERT INTO coment (iduser, commentaire, idpost) VALUES('${idUser}', '${cmt}','${idarticle}')`;
-      db.query(reqB, (error, results) => {
-        if (!error) {
-          return res.status(200).json({ message: "commentaire reçu" });
-        } else {
-          return res.status(400).json({ message: "commentaire non ajouté" });
-        }
-      });
-    }
-  });
+        const idUser = results[0].id;
+        const reqB = `INSERT INTO coment (iduser, commentaire, idpost) VALUES('${idUser}', '${cmt}','${idarticle}')`;
+        db.query(reqB, (error, results) => {
+          if (!error) {
+            return res.status(200).json({ message: "commentaire reçu" });
+          } else {
+            return res.status(400).json({ message: "commentaire non ajouté" });
+          }
+        });
+      }
+    });
+  } else {
+    return res.json({ message: "champ vide" });
+  }
 };
 /* VOIR LES COMMENTAIRES */
 exports.allComment = (req, res, next) => {
@@ -256,7 +261,7 @@ exports.modifierMdp = (req, res, next) => {
 /* --------------------------------- CONTROLEURS ADMIN ---------------------------- */
 exports.adminAllPost = (req, res, next) => {
   const selectAll = `SELECT * FROM post WHERE statut = 0`;
-  if (req.fields.emailUser !== "bacar.darwin.pro@gmail.com") {
+  if (req.fields.emailUser !== "admin@groupmania.fr") {
     return res.status(401).json({ message: "vous n'etes pas un admin" });
   } else {
     db.query(selectAll, (error, results) => {
@@ -278,7 +283,7 @@ exports.moderer = (req, res, next) => {
   console.log(typeof idNumb);
   const leStatut = 1;
   const updtModere = `UPDATE post SET statut = '${leStatut}' WHERE idpost = '${idNumb}'`;
-  if (req.fields.emailUser !== "bacar.darwin.pro@gmail.com") {
+  if (req.fields.emailUser !== "admin@groupmania.fr") {
     return res.status(401).json({ message: "bien reçu ctrl moderer" });
   } else {
     db.query(updtModere, (error, results) => {
@@ -297,13 +302,14 @@ exports.statistiques = (req, res, next) => {
   const selectStats = `SELECT * FROM post`;
   const slcLastP = `SELECT userid FROM post`;
   const sltLastP = `SELECT email FROM users INNER JOIN post  ON users.id = post.userid ORDER BY datepost DESC LIMIT 3`;
-  if (req.fields.emailUser !== "bacar.darwin.pro@gmail.com") {
+  if (req.fields.emailUser !== "admin@groupmania.fr") {
     return res.status(400).json({ message: "erreur 400" });
   } else {
     db.query(selectStats, (error, results) => {
       const nbrPost = results.length;
       if (!error) {
         db.query("SELECT * FROM coment", (error, results) => {
+          const nombreComent = results;
           // voir les trois derniers participants
 
           // nombre de commentaires
@@ -311,17 +317,18 @@ exports.statistiques = (req, res, next) => {
             db.query(slcLastP, (error, results) => {
               const data = results;
               if (!error) {
+                /* 3 derniers users */
                 db.query(sltLastP, (error, results) => {
                   const lastP = results;
                   if (!error) {
                     return res.status(200).json({
                       nbr: nbrPost,
                       users: results,
-                      nbrComent: results.length,
+                      nbrComent: nombreComent.length,
                       userFind: data,
                       last: lastP,
                     });
-                  }else{
+                  } else {
                     console.log(error);
                   }
                 });

@@ -2,6 +2,7 @@
 const bcrypt = require("bcrypt");
 const db = require("../models/bddConfig");
 const jwt = require("jsonwebtoken");
+const randomstring = require("randomstring");
 /* modules used */
 
 /* SIGNUP --------------------------------------------------------------------------------------------------- */
@@ -13,7 +14,7 @@ exports.createUser = (req, res, next) => {
   console.log("------------------");
   console.log(req.body.user);
   let user = JSON.parse(req.body.user);
-
+  let generateId = 'user'+randomstring.generate(7);
   if (user.email !== "" && user.mdp !== "") {
     // EMAIL FORMAT OK
     if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(user.email)) {
@@ -37,7 +38,7 @@ exports.createUser = (req, res, next) => {
           bcrypt
             .hash(password, saltRounds)
             .then((hash) => {
-              const sqlInsert = `INSERT INTO users (email, password) VALUES('${email}', '${hash}')`;
+              const sqlInsert = `INSERT INTO users (email, password, generateid) VALUES('${email}', '${hash}','${generateId}')`;
               console.log(sqlInsert);
               db.query(sqlInsert, (error, results) => {
                 if (!error) {
