@@ -218,6 +218,10 @@ exports.deleteUser = (req, res, next) => {
           });
         } else {
           console.log(error);
+          return res
+            .status(400)
+            .json({ message: "pas de suppression commentaire", error });
+
         }
       });
     } else {
