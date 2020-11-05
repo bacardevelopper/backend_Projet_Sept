@@ -1,6 +1,6 @@
 const db = require("../models/bddConfig");
 const bcrypt = require("bcrypt");
-/* CREATE --------------------------------------------------------------------------------------------------- */
+/* poster article */
 exports.createPost = (req, res, next) => {
   req.body = req.fields;
   console.log("/* ---------- DATA FIELDS ----------- */");
@@ -32,7 +32,7 @@ exports.createPost = (req, res, next) => {
             console.log("bien ajouté a la bdd");
             return res
               .status(201)
-              .json({ mesage: "bien reçu jusqu'au backend ctrl" });
+              .json({ message: "bien reçu jusqu'au backend ctrl" });
           } else {
             console.log(error);
             return res
@@ -46,7 +46,7 @@ exports.createPost = (req, res, next) => {
     });
   }
 };
-/* CREATE --------------------------------------------------------------------------------------------------- */
+
 /* UPDATE --------------------------------------------------------------------------------------------------- */
 exports.updtRecFront = (req, res, next) => {
   const email = req.fields.emailUser;
@@ -61,7 +61,7 @@ exports.updtRecFront = (req, res, next) => {
     }
   });
 };
-/* -------------------------------------- */
+/* modifier post */
 exports.updatePost = (req, res, next) => {
   const email = req.fields.emailUser;
   const idDt = JSON.parse(req.fields.idarticle);
@@ -91,17 +91,26 @@ exports.updatePost = (req, res, next) => {
         }
       });
     } else {
-      return res.status(400).json({ msg: "pas de modification" });
+      return res.status(400).json({ message: "pas de modification" });
     }
   });
 };
-/* UPDATE --------------------------------------------------------------------------------------------------- */
-/* PROFILE --------------------------------------------------------------------------------------------------- */
+
+/* PROFILE (recuperer info profile ) */
 exports.profileRecup = (req, res, next) => {
-  return res.status(200).json(req.fields.emailUser);
+  const email = req.fields.emailUser;
+  const inf = `SELECT generateid FROM users WHERE email = '${email}'`;
+  db.query(inf, (error, results) => {
+    if (!error) {
+      return res.status(200).json(results[0].generateid);
+    } else {
+      console.log(error);
+      return res.status(401).json(error);
+    }
+  });
 };
-/* UPDATE --------------------------------------------------------------------------------------------------- */
-/* GET ALL ARTICLES ------------------------------------------------------------------------------------ */
+
+/* recuperer tous les articles de statut = 1 */
 exports.geAlltPost = (req, res, next) => {
   const selectAll = `SELECT * FROM post WHERE statut = 1 ORDER BY datepost DESC`;
   db.query(selectAll, (error, results) => {
@@ -109,11 +118,11 @@ exports.geAlltPost = (req, res, next) => {
       res.status(200).json(results);
     } else {
       console.log(error);
-      return res.status(400).json({ errror });
+      return res.status(400).json({ error });
     }
   });
 };
-/* OWN POSTS  ------------------------------------------------------------------------------------ */
+/* recuper tous mes articles */
 exports.ownPost = (req, res, next) => {
   const email = req.fields.emailUser;
   const selectOwnPost = `SELECT * FROM post INNER JOIN users  ON post.userid = users.id WHERE email = '${email}'`;
@@ -124,11 +133,11 @@ exports.ownPost = (req, res, next) => {
     } else {
       console.log(error);
       console.log(email);
-      return res.status(401).json({ msg: "erreur" });
+      return res.status(401).json({ message: "erreur" });
     }
   });
 };
-/* delete post ------------------------------------------------------------------------------------ */
+/* supprimer post ------------------------------------------------------------------------------------ */
 exports.delete = (req, res, next) => {
   const email = req.fields.emailUser;
   const idPostDelete = Number(req.fields.delete);
@@ -140,18 +149,18 @@ exports.delete = (req, res, next) => {
       console.log(results[0].id);
       db.query(deleteData, (error, results) => {
         if (!error) {
-          res.status(200).json({ msg: "supprimé" });
+          res.status(200).json({ message: "supprimé" });
         } else {
           console.log(error);
-          return res.status(400).json({ msg: "non supprimé" });
+          return res.status(400).json({ message: "non supprimé" });
         }
       });
     } else {
-      return res.status(401).json({ msg: "non trouvé" });
+      return res.status(401).json({ message: "non trouvé" });
     }
   });
 };
-/* ------------ commentaire ------------------------------- */
+/* ajouter commentaire */
 exports.comment = (req, res, next) => {
   console.log(req.fields);
   const cmt = JSON.parse(req.fields.commentaire);
@@ -179,7 +188,7 @@ exports.comment = (req, res, next) => {
     return res.json({ message: "champ vide" });
   }
 };
-/* VOIR LES COMMENTAIRES */
+/* voir les commentaires*/
 exports.allComment = (req, res, next) => {
   console.log(req.fields);
   const id = JSON.parse(req.fields.idcmt);
@@ -192,7 +201,7 @@ exports.allComment = (req, res, next) => {
     }
   });
 };
-/* DELETE USER */
+/* supprimer utilisateur */
 exports.deleteUser = (req, res, next) => {
   const email = req.fields.emailUser;
   const selectDeleteUser = `SELECT id FROM users WHERE email = '${email}'`;
@@ -221,7 +230,6 @@ exports.deleteUser = (req, res, next) => {
           return res
             .status(400)
             .json({ message: "pas de suppression commentaire", error });
-
         }
       });
     } else {
@@ -230,7 +238,7 @@ exports.deleteUser = (req, res, next) => {
     }
   });
 };
-// modifier
+// modifier mot de passe
 exports.modifierMdp = (req, res, next) => {
   let saltRounds = 10;
   console.log(req.fields.mdp);
@@ -262,6 +270,22 @@ exports.modifierMdp = (req, res, next) => {
     return res.status(400).json({ message: "champ vide ou 5 caracteres min" });
   }
 };
+/* modifier pseudo profile */
+exports.updtProfile = (req, res, next) => {
+  const pseudo = JSON.parse(req.fields.pseudo);
+  const email = req.fields.emailUser;
+  console.log(req.fields);
+
+  const updPseudo = `UPDATE users SET generateid = '${pseudo}' WHERE email = '${email}'`;
+  db.query(updPseudo, (error, results) => {
+    if (!error) {
+      return res.status(201).json({ msg: "pseudo bien modifier" });
+    } else {
+      console.log(error);
+      return res.status(400).json({ msg: "echec de la requete" });
+    }
+  });
+};
 /* --------------------------------- CONTROLEURS ADMIN ---------------------------- */
 exports.adminAllPost = (req, res, next) => {
   const selectAll = `SELECT * FROM post WHERE statut = 0`;
@@ -273,13 +297,14 @@ exports.adminAllPost = (req, res, next) => {
         res.status(200).json(results);
       } else {
         console.log(error);
-        return res.status(400).json({ errror });
+
+        return res.status(400).json({ error });
       }
     });
   }
 };
 
-// moderer
+// moderer articles
 exports.moderer = (req, res, next) => {
   console.log(req.fields);
   const id = JSON.parse(req.fields.moderer);
@@ -301,11 +326,11 @@ exports.moderer = (req, res, next) => {
   }
 };
 
-// statistique
+// statistique recuperation données
 exports.statistiques = (req, res, next) => {
   const selectStats = `SELECT * FROM post`;
   const slcLastP = `SELECT userid FROM post`;
-  const sltLastP = `SELECT email FROM users INNER JOIN post  ON users.id = post.userid ORDER BY datepost DESC LIMIT 3`;
+  const sltLastP = `SELECT * FROM users INNER JOIN post  ON users.id = post.userid ORDER BY datepost DESC`;
   if (req.fields.emailUser !== "admin@groupmania.fr") {
     return res.status(400).json({ message: "erreur 400" });
   } else {

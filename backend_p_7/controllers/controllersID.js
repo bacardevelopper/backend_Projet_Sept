@@ -5,8 +5,7 @@ const jwt = require("jsonwebtoken");
 const randomstring = require("randomstring");
 /* modules used */
 
-/* SIGNUP --------------------------------------------------------------------------------------------------- */
-/* à la reussite finale , l'utilisateur doit etre ajouter et server renvoit l'id */
+/* inscription d'utilisateur */
 exports.createUser = (req, res, next) => {
   let saltRounds = 10;
   req.body.user = req.fields.user;
@@ -14,9 +13,8 @@ exports.createUser = (req, res, next) => {
   console.log("------------------");
   console.log(req.body.user);
   let user = JSON.parse(req.body.user);
-  let generateId = 'user'+randomstring.generate(7);
+  let generateId = "user" + randomstring.generate(7);
   if (user.email !== "" && user.mdp !== "") {
-    // EMAIL FORMAT OK
     if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(user.email)) {
       let email = user.email;
       let password = user.mdp;
@@ -25,14 +23,10 @@ exports.createUser = (req, res, next) => {
       let sqlSelectEmail = `SELECT email FROM users WHERE email = '${email}'`;
       console.log(req.body);
 
-      /* EXECUTION DES REQUETES */
-      /* Verification : email exist in bdd */
       db.query(sqlSelectEmail, (error, results) => {
         // on verifie si l'email existe
 
         if (results && results.length === 0) {
-          // console.log(results);
-          // si on  trouve pas l'email ; on lance le hashage
           console.log(results);
           /* BCRYPT */
           bcrypt
@@ -52,7 +46,6 @@ exports.createUser = (req, res, next) => {
             .catch((error) => {
               console.log(error);
             });
-          /* FIN BCRYPT */
         } else {
           return res.status(400).json({ message: "email déjà existant" });
           console.log("error : " + error);
