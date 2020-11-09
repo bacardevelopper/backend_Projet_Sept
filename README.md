@@ -7,7 +7,7 @@ git clone https://github.com/bacardevelopper/backend_Projet_Sept.git
 ```
 (importer la bdd sql nommer (nodejs.sql) sur votre systeme de gestion de bdd)
 ## sur l'interface graphique connectez vous avec ces ID
-Pour etre moderateur du site we
+Pour etre moderateur (admin) du site web
 ```
 // email  : admin@groupmania.fr
 // mdp : mayana976
