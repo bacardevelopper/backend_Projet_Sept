@@ -5,7 +5,7 @@ Ou si avez l'environnement qui peut tourner une bdd sql et importer la bdd (node
 ```
 git clone https://github.com/bacardevelopper/backend_Projet_Sept.git
 ```
-importer la bdd sql sur nodejs.js
+importer la bdd sql
 
 Adresse email admin : admin@groupmania.fr
 
