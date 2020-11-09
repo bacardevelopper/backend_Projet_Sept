@@ -6,20 +6,20 @@ const randomstring = require("randomstring");
 module.exports = (req, res, next) => {
   /* si un fichier est envoyé on enregistre sinon nada */
   if (req.files.file) {
-    console.log(req.files.file.name);
+    //console.log(req.files.file.name);
     const file = req.files.file;
-    console.log(req.fields.cookie);
+    //console.log(req.fields.cookie);
     let oldpath = file.path;
     file.name = randomstring.generate(7) + file.name.split(".").join("")+".png";
     let newPath = process.cwd() + "/uploadFiles/" + "" + "fil" + file.name;
 
     fs.readFile(oldpath, (err, data) => {
-      console.log(err);
+      //console.log(err);
       fs.writeFile(newPath, data, (err) => {
         if (err) {
-          console.log(err);
+          //console.log(err);
         } else {
-          console.log(newPath);
+          //console.log(newPath);
           req.files.urlfile = `${req.protocol}://${req.get(
             "host"
           )}/uploadfiles/fil${file.name}`;

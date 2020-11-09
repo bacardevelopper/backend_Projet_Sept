@@ -4,10 +4,8 @@ const jwt = require("jsonwebtoken");
 
 /* module export function verify token authentification */
 module.exports = (req, res, next) => {
-  console.log(req.fields.cookie);
   const cookie = JSON.parse(req.fields.cookie);
-  console.log(cookie);
-  
+
   if (cookie) {
     jwt.verify(cookie, "TOKEN_IS_FREE_OPEN_SOURCE", (err, data) => {
       if (err) {
@@ -16,12 +14,10 @@ module.exports = (req, res, next) => {
         // INFOS USER DECRYPTED
         req.fields.emailUser = data.userId;
 
-        console.log(req.body);
         next();
       }
     });
   } else {
     return res.status(400).json({ message: "erreur et non authetifié" });
   }
-  
 };

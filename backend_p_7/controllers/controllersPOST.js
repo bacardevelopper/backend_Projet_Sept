@@ -3,17 +3,12 @@ const bcrypt = require("bcrypt");
 /* poster article */
 exports.createPost = (req, res, next) => {
   req.body = req.fields;
-  console.log("/* ---------- DATA FIELDS ----------- */");
-  console.log(req.fields);
-  console.table(req.body);
-  console.log(req.fields.data);
+
   const data = JSON.parse(req.fields.data);
   const titre = data.titre;
   const texte = data.texte;
   const email = req.fields.emailUser;
-  console.log(data);
-  console.log(data.titre);
-  console.log(req.fields.emailUser);
+
   const urlFictif = req.files.urlfile;
   /* ------------------------------------------------------------- */
   if (data.titre !== "" && data.texte !== "") {
@@ -21,7 +16,6 @@ exports.createPost = (req, res, next) => {
 
     db.query(selectIdUser, (error, results) => {
       if (results) {
-        console.log(results[0].id);
         /* recuperation user id */
         const userIdFound = results[0].id;
         const leGenerateId = results[0].generateid;
@@ -29,19 +23,16 @@ exports.createPost = (req, res, next) => {
 
         db.query(sqlInsertPost, (error, results) => {
           if (!error) {
-            console.log("bien ajouté a la bdd");
             return res
               .status(201)
               .json({ message: "bien reçu jusqu'au backend ctrl" });
           } else {
-            console.log(error);
             return res
               .status(400)
               .json({ message: "données non enregistrer dans la bdd" });
           }
         });
       } else {
-        console.log(error);
       }
     });
   }
@@ -82,11 +73,8 @@ exports.updatePost = (req, res, next) => {
       /* -- si fichier non present ne pas enr° url img -- */
       db.query(arrayReq[idFile], (error, results) => {
         if (!error) {
-          console.log(results);
-          console.log(idDt);
           res.status(200).json({ message: "reussite update" });
         } else {
-          console.log(error);
           return res.status(401).json({ message: " probleme sql" });
         }
       });
@@ -104,7 +92,6 @@ exports.profileRecup = (req, res, next) => {
     if (!error) {
       return res.status(200).json(results[0].generateid);
     } else {
-      console.log(error);
       return res.status(401).json(error);
     }
   });
@@ -115,9 +102,9 @@ exports.geAlltPost = (req, res, next) => {
   const selectAll = `SELECT * FROM post WHERE statut = 1 ORDER BY datepost DESC`;
   db.query(selectAll, (error, results) => {
     if (results) {
+      // console.table(results);
       res.status(200).json(results);
     } else {
-      console.log(error);
       return res.status(400).json({ error });
     }
   });
@@ -129,11 +116,9 @@ exports.ownPost = (req, res, next) => {
 
   db.query(selectOwnPost, (error, results) => {
     if (!error) {
-      res.status(200).json(results);
+      return res.status(200).json(results);
     } else {
-      console.log(error);
-      console.log(email);
-      return res.status(401).json({ message: "erreur" });
+      res.status(401).json({ message: "erreur" });
     }
   });
 };
@@ -146,13 +131,19 @@ exports.delete = (req, res, next) => {
     if (!error) {
       const id = results[0].id;
       const deleteData = `DELETE FROM post WHERE idpost = ${idPostDelete}  AND userid = ${id}`;
-      console.log(results[0].id);
       db.query(deleteData, (error, results) => {
         if (!error) {
-          res.status(200).json({ message: "supprimé" });
+          /* delete commentaire */
+          const deleteComment = `DELETE FROM coment WHERE idpost = ${idPostDelete}  AND iduser = ${id}`;
+          db.query(deleteComment, (error, results) => {
+            if (!error) {
+              return res.status(200).json({ message: "supprimé" });
+            } else {
+              return res.status(400).json({ message: "pas supprimé" });
+            }
+          });
         } else {
-          console.log(error);
-          return res.status(400).json({ message: "non supprimé" });
+          return res.status(400).json({ message: "non supprimé general" });
         }
       });
     } else {
@@ -162,7 +153,6 @@ exports.delete = (req, res, next) => {
 };
 /* ajouter commentaire */
 exports.comment = (req, res, next) => {
-  console.log(req.fields);
   const cmt = JSON.parse(req.fields.commentaire);
   const idarticle = JSON.parse(req.fields.idArticle);
   const email = req.fields.emailUser;
@@ -171,8 +161,6 @@ exports.comment = (req, res, next) => {
   if (cmt !== "") {
     db.query(reqA, (error, results) => {
       if (!error) {
-        console.log(results);
-
         const idUser = results[0].id;
         const reqB = `INSERT INTO coment (iduser, commentaire, idpost) VALUES('${idUser}', '${cmt}','${idarticle}')`;
         db.query(reqB, (error, results) => {
@@ -190,7 +178,6 @@ exports.comment = (req, res, next) => {
 };
 /* voir les commentaires*/
 exports.allComment = (req, res, next) => {
-  console.log(req.fields);
   const id = JSON.parse(req.fields.idcmt);
   const selectUserId = `SELECT * FROM coment WHERE idpost = '${id}'`;
   db.query(selectUserId, (error, results) => {
@@ -207,7 +194,6 @@ exports.deleteUser = (req, res, next) => {
   const selectDeleteUser = `SELECT id FROM users WHERE email = '${email}'`;
   db.query(selectDeleteUser, (error, results) => {
     if (!error) {
-      console.log(results[0].id);
       /* supprimer commentaires */
       const iduserUse = results[0].id;
       const deleteCommentaire = `DELETE FROM coment WHERE iduser = ${iduserUse}`;
@@ -226,14 +212,12 @@ exports.deleteUser = (req, res, next) => {
             }
           });
         } else {
-          console.log(error);
           return res
             .status(400)
             .json({ message: "pas de suppression commentaire", error });
         }
       });
     } else {
-      console.log(error);
       return res.status(401).json({ message: "no user delete" });
     }
   });
@@ -241,7 +225,7 @@ exports.deleteUser = (req, res, next) => {
 // modifier mot de passe
 exports.modifierMdp = (req, res, next) => {
   let saltRounds = 10;
-  console.log(req.fields.mdp);
+
   const mdpVf = req.fields.mdp;
   if (mdpVf.length > 5 && mdpVf !== "" && mdpVf !== "") {
     const mdpMdf = JSON.parse(req.fields.mdp);
@@ -258,12 +242,10 @@ exports.modifierMdp = (req, res, next) => {
               .status(200)
               .json({ message: "mot de passe bien modifier" });
           } else {
-            console.log(error);
           }
         });
       })
       .catch((error) => {
-        console.log(error);
         return res.status(400).json({ message: "non hash" });
       });
   } else {
@@ -274,14 +256,12 @@ exports.modifierMdp = (req, res, next) => {
 exports.updtProfile = (req, res, next) => {
   const pseudo = JSON.parse(req.fields.pseudo);
   const email = req.fields.emailUser;
-  console.log(req.fields);
 
   const updPseudo = `UPDATE users SET generateid = '${pseudo}' WHERE email = '${email}'`;
   db.query(updPseudo, (error, results) => {
     if (!error) {
       return res.status(201).json({ msg: "pseudo bien modifier" });
     } else {
-      console.log(error);
       return res.status(400).json({ msg: "echec de la requete" });
     }
   });
@@ -296,8 +276,6 @@ exports.adminAllPost = (req, res, next) => {
       if (results) {
         res.status(200).json(results);
       } else {
-        console.log(error);
-
         return res.status(400).json({ error });
       }
     });
@@ -306,10 +284,9 @@ exports.adminAllPost = (req, res, next) => {
 
 // moderer articles
 exports.moderer = (req, res, next) => {
-  console.log(req.fields);
   const id = JSON.parse(req.fields.moderer);
   const idNumb = Number(id);
-  console.log(typeof idNumb);
+  //console.log(typeof idNumb);
   const leStatut = 1;
   const updtModere = `UPDATE post SET statut = '${leStatut}' WHERE idpost = '${idNumb}'`;
   if (req.fields.emailUser !== "admin@groupmania.fr") {
@@ -319,7 +296,6 @@ exports.moderer = (req, res, next) => {
       if (results) {
         return res.status(200).json({ msg: "bien modifier" });
       } else {
-        console.log(error);
         return res.status(400).json({ error });
       }
     });
@@ -358,7 +334,6 @@ exports.statistiques = (req, res, next) => {
                       last: lastP,
                     });
                   } else {
-                    console.log(error);
                   }
                 });
               }
