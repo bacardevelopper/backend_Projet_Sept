@@ -8,8 +8,9 @@ git clone https://github.com/bacardevelopper/backend_Projet_Sept.git
 importer la bdd sql sur nodejs.js
 
 Adresse email admin : admin@groupmania.fr
+
 Mot de passe : mayana976
-nodejs.sql
+
 
 ## Reinstaller les modules
 ```
