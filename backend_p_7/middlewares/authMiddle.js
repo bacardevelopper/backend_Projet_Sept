@@ -12,6 +12,7 @@ module.exports = (req, res, next) => {
         res.status(401).json({ message: "non auhtentifié" });
       } else {
         // INFOS USER DECRYPTED
+        // console.log(data);
         req.fields.emailUser = data.userId;
 
         next();

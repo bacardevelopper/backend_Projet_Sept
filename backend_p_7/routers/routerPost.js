@@ -19,7 +19,7 @@ myRouterPost.post("/admin/all", authVerify, fonctionPost.adminAllPost);
 myRouterPost.post("/moderer", authVerify, fonctionPost.moderer);
 myRouterPost.put("/modifier/mdp", authVerify, fonctionPost.modifierMdp);
 myRouterPost.post("/comment", authVerify, fonctionPost.comment);
-myRouterPost.post("/all/comment", authVerify, fonctionPost.allComment);
+myRouterPost.post("/get/comment", authVerify, fonctionPost.getComment);
 myRouterPost.post("/delete/user", authVerify, fonctionPost.deleteUser)
 myRouterPost.post("/stats", authVerify, fonctionPost.statistiques);
 myRouterPost.put("/updt/profile", authVerify, fonctionPost.updtProfile);

@@ -40,7 +40,6 @@ exports.createPost = (req, res, next) => {
 
 /* UPDATE --------------------------------------------------------------------------------------------------- */
 exports.updtRecFront = (req, res, next) => {
-  const email = req.fields.emailUser;
   const idDt = JSON.parse(req.fields.idarticle);
   const idDtNumb = Number(idDt);
   const reqPrepare = `SELECT * FROM post WHERE idpost = '${idDtNumb}'`;
@@ -56,7 +55,6 @@ exports.updtRecFront = (req, res, next) => {
 exports.updatePost = (req, res, next) => {
   const email = req.fields.emailUser;
   const idDt = JSON.parse(req.fields.idarticle);
-  const idDtNumb = Number(idDt);
   const data = JSON.parse(req.fields.data);
   const titre = data.titre;
   const texte = data.texte;
@@ -102,7 +100,8 @@ exports.geAlltPost = (req, res, next) => {
   const selectAll = `SELECT * FROM post WHERE statut = 1 ORDER BY datepost DESC`;
   db.query(selectAll, (error, results) => {
     if (results) {
-      // console.table(results);
+      //console.log(results);
+
       res.status(200).json(results);
     } else {
       return res.status(400).json({ error });
@@ -177,7 +176,7 @@ exports.comment = (req, res, next) => {
   }
 };
 /* voir les commentaires*/
-exports.allComment = (req, res, next) => {
+exports.getComment = (req, res, next) => {
   const id = JSON.parse(req.fields.idcmt);
   const selectUserId = `SELECT * FROM coment WHERE idpost = '${id}'`;
   db.query(selectUserId, (error, results) => {
@@ -326,6 +325,7 @@ exports.statistiques = (req, res, next) => {
                 db.query(sltLastP, (error, results) => {
                   const lastP = results;
                   if (!error) {
+                    //console.log(results);
                     return res.status(200).json({
                       nbr: nbrPost,
                       users: results,
@@ -338,7 +338,6 @@ exports.statistiques = (req, res, next) => {
                 });
               }
             });
-            const nbrComent = results;
           }
         });
       } else {

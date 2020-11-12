@@ -15,3 +15,4 @@ npm i
 ```
 npm start
 ```
+Vous etes enfin pret à executer des requetes depuis le frontend angular
