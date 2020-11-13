@@ -1,5 +1,6 @@
 # DOCUMENTATION EN FR DU BACKEND PROJET 7
 email admin : admin@groupmania.fr , mdp : mayana976
+### 
 Avant de demarrer installer XAMP pour mysql.
 Ou si avez l'environnement qui peut tourner une bdd sql et importer la bdd (nodejs.sql).
 ## Cloner le repertoir sur votre machine en local
