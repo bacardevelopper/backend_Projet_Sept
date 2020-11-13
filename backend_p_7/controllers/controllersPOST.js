@@ -133,7 +133,7 @@ exports.delete = (req, res, next) => {
       db.query(deleteData, (error, results) => {
         if (!error) {
           /* delete commentaire */
-          const deleteComment = `DELETE FROM coment WHERE idpost = ${idPostDelete}  AND iduser = ${id}`;
+          const deleteComment = `DELETE FROM coment WHERE idpost = ${idPostDelete}`;
           db.query(deleteComment, (error, results) => {
             if (!error) {
               return res.status(200).json({ message: "supprimé" });
@@ -314,7 +314,7 @@ exports.statistiques = (req, res, next) => {
       if (!error) {
         db.query("SELECT * FROM coment", (error, results) => {
           const nombreComent = results;
-          // voir les trois derniers participants
+
 
           // nombre de commentaires
           if (!error) {

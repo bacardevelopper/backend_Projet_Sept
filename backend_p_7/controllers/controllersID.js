@@ -21,8 +21,6 @@ exports.createUser = (req, res, next) => {
       let sqlSelectEmail = `SELECT email FROM users WHERE email = '${email}'`;
 
       db.query(sqlSelectEmail, (error, results) => {
-        // on verifie si l'email existe
-
         if (results && results.length === 0) {
           /* BCRYPT */
           bcrypt
@@ -74,17 +72,15 @@ exports.loginUser = (req, res, next) => {
           if (results) {
             bcrypt.compare(user.mdp, results[0].password, (err, result) => {
               if (result) {
-                // CREATION TOKEN
                 const token = jwt.sign(
                   { userId: user.email },
                   "TOKEN_IS_FREE_OPEN_SOURCE",
                   { expiresIn: "1h" }
                 );
                 let sqlUpdateDateLogin = `UPDATE users SET datemaj = NOW() WHERE id = '${results[0].id}'`;
-                // mise à jour de la date connexion
+
                 db.query(sqlUpdateDateLogin, (error, results) => {
                   if (!error) {
-                    // renvoit status et token en json au client
                     return res.status(200).json({ userToken: token });
                   }
                 });
