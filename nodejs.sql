@@ -32,7 +32,7 @@ CREATE TABLE `coment` (
   `iduser` int(255) NOT NULL,
   `commentaire` varchar(355) NOT NULL,
   `idpost` int(255) NOT NULL,
-  `datecoment` datetime NOT NULL DEFAULT current_timestamp()
+  `datecoment` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
